@@ -1,4 +1,4 @@
-//! CloudGhidra Enumeration Types
+//! CloudLens Enumeration Types
 //! 
 //! This module defines all enumeration types used throughout the platform,
 //! including cloud providers, resource types, risk classifications, and more.

@@ -4,7 +4,7 @@
 //! - EC2, RDS, Lambda, S3, IAM, VPC, EKS, ECS
 //! - Real-time configuration fetching via AWS SDK
 //! - Credential management and region handling
-//! - Resource normalization to CloudGhidra internal models
+//! - Resource normalization to CloudLens internal models
 
 use async_trait::async_trait;
 use aws_config::{meta::region::RegionProviderChain, BehaviorVersion, load_from_env};
@@ -23,7 +23,7 @@ use crate::models::{
     NetworkConfig, SecurityGroup, Tag, ComplianceStatus
 };
 use crate::traits::CloudConnector;
-use crate::error::{CloudGhidraError, Result};
+use crate::error::{CloudLensError, Result};
 
 /// Configuration for AWS Connector
 #[derive(Debug, Clone)]
@@ -113,7 +113,7 @@ impl AwsConnector {
     /// Scan EC2 instances
     #[instrument(skip(self))]
     async fn scan_ec2_instances(&self) -> Result<Vec<CloudResource>> {
-        let client = self.ec2_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.ec2_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
         
         let describe_output = client
@@ -191,7 +191,7 @@ impl AwsConnector {
     /// Scan S3 Buckets
     #[instrument(skip(self))]
     async fn scan_s3_buckets(&self) -> Result<Vec<CloudResource>> {
-        let client = self.s3_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.s3_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let list_output = client.list_buckets().send().await?;
@@ -254,7 +254,7 @@ impl AwsConnector {
     /// Scan RDS Instances
     #[instrument(skip(self))]
     async fn scan_rds_instances(&self) -> Result<Vec<CloudResource>> {
-        let client = self.rds_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.rds_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let describe_output = client
@@ -326,7 +326,7 @@ impl AwsConnector {
     /// Scan IAM Users
     #[instrument(skip(self))]
     async fn scan_iam_users(&self) -> Result<Vec<CloudResource>> {
-        let client = self.iam_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.iam_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let mut marker = None;
@@ -457,7 +457,7 @@ impl CloudConnector for AwsConnector {
     #[instrument(skip(self))]
     async fn scan_resources(&self, resource_types: Option<Vec<ResourceType>>) -> Result<Vec<CloudResource>> {
         if !self.is_connected {
-            return Err(CloudGhidraError::NotConnected);
+            return Err(CloudLensError::NotConnected);
         }
 
         let mut all_resources = Vec::new();

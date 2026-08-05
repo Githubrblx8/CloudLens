@@ -4,7 +4,7 @@
 //! - Virtual Machines, Storage Accounts, SQL Database, Key Vault, IAM (Entra ID)
 //! - Real-time configuration fetching via Azure SDK
 //! - Subscription and tenant handling
-//! - Resource normalization to CloudGhidra internal models
+//! - Resource normalization to CloudLens internal models
 
 use async_trait::async_trait;
 use azure_identity::{DefaultAzureCredential, TokenCredentialOptions};
@@ -21,7 +21,7 @@ use crate::models::{
     CloudProvider, ResourceType, CloudResource, ResourceMetadata, Tag,
 };
 use crate::traits::CloudConnector;
-use crate::error::{CloudGhidraError, Result};
+use crate::error::{CloudLensError, Result};
 
 /// Configuration for Azure Connector
 #[derive(Debug, Clone)]
@@ -97,7 +97,7 @@ impl AzureConnector {
         }
 
         let credential = DefaultAzureCredential::new(options)
-            .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to create Azure credential: {}", e)))?;
+            .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to create Azure credential: {}", e)))?;
         
         let credential_arc = Arc::new(credential);
         
@@ -116,11 +116,11 @@ impl AzureConnector {
     /// Scan Virtual Machines
     #[instrument(skip(self))]
     async fn scan_virtual_machines(&self) -> Result<Vec<CloudResource>> {
-        let client = self.compute_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.compute_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let vms = client.virtual_machines().list_all().await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list VMs: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list VMs: {}", e)))?;
 
         for vm in vms.into_iter() {
             if let Some(vm_name) = vm.name {
@@ -190,11 +190,11 @@ impl AzureConnector {
     /// Scan Storage Accounts
     #[instrument(skip(self))]
     async fn scan_storage_accounts(&self) -> Result<Vec<CloudResource>> {
-        let client = self.storage_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.storage_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let accounts = client.storage_accounts().list().await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list storage accounts: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list storage accounts: {}", e)))?;
 
         for account in accounts.into_iter() {
             if let Some(account_name) = account.name {
@@ -278,11 +278,11 @@ impl AzureConnector {
     /// Scan SQL Servers
     #[instrument(skip(self))]
     async fn scan_sql_servers(&self) -> Result<Vec<CloudResource>> {
-        let client = self.sql_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.sql_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let servers = client.servers().list().await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list SQL servers: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list SQL servers: {}", e)))?;
 
         for server in servers.into_iter() {
             if let Some(server_name) = server.name {
@@ -356,11 +356,11 @@ impl AzureConnector {
     /// Scan Key Vaults
     #[instrument(skip(self))]
     async fn scan_key_vaults(&self) -> Result<Vec<CloudResource>> {
-        let client = self.keyvault_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.keyvault_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let vaults = client.vaults().list().await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list key vaults: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list key vaults: {}", e)))?;
 
         for vault in vaults.into_iter() {
             if let Some(vault_name) = vault.name {
@@ -457,11 +457,11 @@ impl AzureConnector {
     /// Scan Network Security Groups
     #[instrument(skip(self))]
     async fn scan_nsgs(&self) -> Result<Vec<CloudResource>> {
-        let client = self.network_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.network_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let nsgs = client.network_security_groups().list_all().await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list NSGs: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list NSGs: {}", e)))?;
 
         for nsg in nsgs.into_iter() {
             if let Some(nsg_name) = nsg.name {
@@ -569,7 +569,7 @@ impl CloudConnector for AzureConnector {
     #[instrument(skip(self))]
     async fn scan_resources(&self, resource_types: Option<Vec<ResourceType>>) -> Result<Vec<CloudResource>> {
         if !self.is_connected {
-            return Err(CloudGhidraError::NotConnected);
+            return Err(CloudLensError::NotConnected);
         }
 
         let mut all_resources = Vec::new();

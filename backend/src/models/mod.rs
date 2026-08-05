@@ -1,6 +1,6 @@
-//! CloudGhidra Core Data Models
+//! CloudLens Core Data Models
 //! 
-//! This module contains all the data structures used throughout the CloudGhidra platform.
+//! This module contains all the data structures used throughout the CloudLens platform.
 //! It provides comprehensive type definitions for cloud resources, security risks,
 //! IAM policies, graph structures, and analysis results.
 

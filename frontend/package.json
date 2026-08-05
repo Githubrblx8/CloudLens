@@ -1,7 +1,7 @@
 {
-  "name": "cloudghidra-frontend",
+  "name": "cloudlens-frontend",
   "version": "0.1.0",
-  "description": "CloudGhidra - Advanced Cloud Security Analysis Platform Frontend",
+  "description": "CloudLens - Advanced Cloud Security Analysis Platform Frontend",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",

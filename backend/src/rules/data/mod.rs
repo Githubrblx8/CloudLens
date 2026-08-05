@@ -1,4 +1,4 @@
-// CloudGhidra - Data Security Rules Module
+// CloudLens - Data Security Rules Module
 // Comprehensive data protection and storage security rules
 // Part of the 40K lines security rules implementation
 

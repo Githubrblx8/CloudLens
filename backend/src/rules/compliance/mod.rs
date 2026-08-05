@@ -1,4 +1,4 @@
-// CloudGhidra - Compliance Security Rules Module
+// CloudLens - Compliance Security Rules Module
 // Comprehensive compliance and regulatory security rules
 // Part of the 40K lines security rules implementation
 

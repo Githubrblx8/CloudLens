@@ -1,6 +1,6 @@
-//! CloudGhidra Server - Main entry point
+//! CloudLens Server - Main entry point
 //! 
-//! This is the main server binary for CloudGhidra, providing REST APIs
+//! This is the main server binary for CloudLens, providing REST APIs
 //! for cloud infrastructure analysis and security risk detection.
 
 use axum::{
@@ -18,7 +18,7 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use cloudghidra_core::{
+use cloudlens_core::{
     InfrastructureAnalyzer,
     CloudResource,
     ResourceType,
@@ -46,12 +46,12 @@ async fn main() {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "cloudghidra=debug,tower_http=debug".into()),
+                .unwrap_or_else(|_| "cloudlens=debug,tower_http=debug".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    tracing::info!("Starting CloudGhidra Server...");
+    tracing::info!("Starting CloudLens Server...");
 
     // Create application state
     let state = AppState::new();

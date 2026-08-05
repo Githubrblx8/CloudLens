@@ -1,8 +1,8 @@
-# CloudGhidra
+# CloudLens
 
-**CloudGhidra** is a free and open-source cloud infrastructure analysis platform designed to reverse-engineer, visualize, and secure complex cloud environments. 
+**CloudLens** is a free and open-source cloud infrastructure analysis platform designed to reverse-engineer, visualize, and secure complex cloud environments. 
 
-Just as **Ghidra** revolutionized binary reverse engineering by providing a powerful suite for disassembly and decompilation, **CloudGhidra** aims to become the definitive "disassembler" for modern cloud architectures. It transforms opaque infrastructure-as-code, API configurations, and runtime states into understandable, visualizable, and analyzable graphs.
+Just as **Ghidra** revolutionized binary reverse engineering by providing a powerful suite for disassembly and decompilation, **CloudLens** aims to become the definitive "disassembler" for modern cloud architectures. It transforms opaque infrastructure-as-code, API configurations, and runtime states into understandable, visualizable, and analyzable graphs.
 
 ---
 
@@ -10,7 +10,7 @@ Just as **Ghidra** revolutionized binary reverse engineering by providing a powe
 
 Modern cloud infrastructures have become incredibly complex: hundreds of microservices, intricate IAM policies, virtual networks, container orchestration, and hidden dependencies. Understanding the true security posture of an architecture often requires deep expertise and endless command-line navigation.
 
-**CloudGhidra** creates an "intelligent analysis system" capable of mapping, understanding, and explaining cloud infrastructures. It acts as a **digital microscope**, revealing hidden structures, dangerous permission paths, and misconfigurations that traditional scanners miss.
+**CloudLens** creates an "intelligent analysis system" capable of mapping, understanding, and explaining cloud infrastructures. It acts as a **digital microscope**, revealing hidden structures, dangerous permission paths, and misconfigurations that traditional scanners miss.
 
 ### Key Capabilities
 *   **Infrastructure Disassembly:** Decompose AWS, Azure, GCP, and Kubernetes environments into fundamental components (VMs, Containers, DBs, Networks, Identities).
@@ -23,7 +23,7 @@ Modern cloud infrastructures have become incredibly complex: hundreds of microse
 
 ## 🏗️ Architecture
 
-CloudGhidra follows a modular, extensible architecture similar to Ghidra's framework, allowing for custom loaders, analyzers, and visualizers.
+CloudLens follows a modular, extensible architecture similar to Ghidra's framework, allowing for custom loaders, analyzers, and visualizers.
 
 ### Core Components
 
@@ -50,7 +50,7 @@ Analyzes the transitive closure of permissions. It doesn't just list policies; i
 *   Maps trust relationships between accounts and tenants.
 
 ### 3. Advanced Visualization
-Move beyond spreadsheets. CloudGhidra renders the infrastructure as a navigable graph.
+Move beyond spreadsheets. CloudLens renders the infrastructure as a navigable graph.
 *   **Node Types:** Distinct visuals for Compute, Storage, Network, and Identity.
 *   **Edge Types:** Represents traffic flow, permission grants, and ownership.
 *   **Filtering:** Isolate specific sub-graphs (e.g., "Show only paths to Production Database").
@@ -64,7 +64,7 @@ An integrated AI agent acts as a co-pilot for security engineers.
 
 ## 🛠️ Getting Started
 
-> **Note:** CloudGhidra is currently in active development. The following instructions outline the planned setup process.
+> **Note:** CloudLens is currently in active development. The following instructions outline the planned setup process.
 
 ### Prerequisites
 *   Rust (latest stable) or Go 1.20+
@@ -77,8 +77,8 @@ An integrated AI agent acts as a co-pilot for security engineers.
 
 ```bash
 # Clone the repository
-git clone https://github.com/cloudghidra/cloudghidra.git
-cd cloudghidra
+git clone https://github.com/cloudlens-project/cloudlens.git
+cd cloudlens
 
 # Start backend services (Database, Graph DB, API)
 docker-compose up -d
@@ -95,9 +95,9 @@ npm run dev
 
 ### Basic Usage
 
-1.  **Ingest Data:** Point CloudGhidra at a cloud account or a Terraform state file.
+1.  **Ingest Data:** Point CloudLens at a cloud account or a Terraform state file.
     ```bash
-    ./cloudghidra-cli ingest --provider aws --profile default --output project_alpha.cg
+    ./cloudlens-cli ingest --provider aws --profile default --output project_alpha.cg
     ```
 2.  **Launch UI:** Open the web interface to explore the generated graph.
 3.  **Analyze:** Run the default rule set to identify critical risks.
@@ -107,7 +107,7 @@ npm run dev
 
 ## 📚 Supported Technologies
 
-CloudGhidra is designed to be cloud-agnostic. Initial support focuses on:
+CloudLens is designed to be cloud-agnostic. Initial support focuses on:
 
 *   **Public Clouds:** AWS, Microsoft Azure, Google Cloud Platform (GCP)
 *   **Container Orchestration:** Kubernetes (EKS, AKS, GKE, Vanilla), Docker Swarm
@@ -118,7 +118,7 @@ CloudGhidra is designed to be cloud-agnostic. Initial support focuses on:
 
 ## 🤝 Contributing
 
-CloudGhidra is built on the philosophy that security tools should be transparent, extensible, and community-driven. We welcome contributions in:
+CloudLens is built on the philosophy that security tools should be transparent, extensible, and community-driven. We welcome contributions in:
 
 *   **Loader Development:** Creating parsers for new cloud providers or IaC formats.
 *   **Analyzer Scripts:** Writing new rules for detecting specific misconfigurations.
@@ -127,11 +127,19 @@ CloudGhidra is built on the philosophy that security tools should be transparent
 
 Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
 
+### Community & Support
+
+*   **🐛 Issue Tracker:** Report bugs and feature requests on GitHub
+*   **💬 Discussions:** Ask questions and share ideas in [GitHub Discussions](../../discussions)
+*   **📧 Contact:** security@cloudlens.dev
+
+*Note: We are currently growing our community. Join the conversation via GitHub Discussions or reach out directly via email.*
+
 ---
 
 ## 📄 License
 
-CloudGhidra is released under the **Apache License 2.0**, fostering a wide ecosystem of commercial and academic use, similar to Ghidra.
+CloudLens is released under the **Apache License 2.0**, fostering a wide ecosystem of commercial and academic use, similar to Ghidra.
 
 See [LICENSE](LICENSE) for details.
 
@@ -139,11 +147,11 @@ See [LICENSE](LICENSE) for details.
 
 ## 🌍 Vision
 
-> "Modern infrastructures have become too complex to be understood solely through command lines and JSON logs. CloudGhidra aims to create a digital microscope capable of revealing the hidden structure and risks of the cloud."
+> "Modern infrastructures have become too complex to be understood solely through command lines and JSON logs. CloudLens aims to create a digital microscope capable of revealing the hidden structure and risks of the cloud."
 
 Join us in building the future of cloud security analysis.
 
 ---
 
-**CloudGhidra Team**  
+**CloudLens Team**  
 *Reverse Engineering the Cloud.*

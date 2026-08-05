@@ -1,11 +1,11 @@
 [package]
-name = "cloudghidra"
+name = "cloudlens"
 version = "0.1.0"
 edition = "2021"
-authors = ["CloudGhidra Team <team@cloudghidra.io>"]
+authors = ["CloudLens Team <team@cloudlens.io>"]
 description = "An advanced platform for analyzing and understanding cloud infrastructures - The Ghidra of Cloud Security"
 license = "Apache-2.0"
-repository = "https://github.com/cloudghidra/cloudghidra"
+repository = "https://github.com/cloudlens-project/cloudlens"
 keywords = ["cloud", "security", "analysis", "aws", "azure", "gcp", "kubernetes", "iam", "graph"]
 categories = ["security", "development-tools", "visualization"]
 readme = "../README.md"
@@ -246,11 +246,11 @@ cargo-audit = "0.19"
 trycmd = "0.15"
 
 [[bin]]
-name = "cloudghidra-server"
+name = "cloudlens-server"
 path = "src/main.rs"
 
 [[bin]]
-name = "cloudghidra-cli"
+name = "cloudlens-cli"
 path = "src/bin/cli.rs"
 required-features = ["cli"]
 
@@ -259,7 +259,7 @@ name = "analyzer_benchmarks"
 harness = false
 
 [lib]
-name = "cloudghidra_core"
+name = "cloudlens_core"
 path = "src/lib.rs"
 
 [features]

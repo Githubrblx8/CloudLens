@@ -1,6 +1,6 @@
 //! Security Rules Module
 //! 
-//! This module contains the comprehensive security rule engine for CloudGhidra.
+//! This module contains the comprehensive security rule engine for CloudLens.
 //! It implements over 250 security detection rules across multiple categories:
 //! - IAM & Permissions
 //! - Network Security

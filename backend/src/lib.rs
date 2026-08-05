@@ -1,4 +1,4 @@
-//! CloudGhidra Core Library
+//! CloudLens Core Library
 //! 
 //! This library provides the core functionality for analyzing cloud infrastructures,
 //! building resource graphs, and detecting security risks.

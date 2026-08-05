@@ -1,4 +1,4 @@
-// CloudGhidra - Network Security Rules Module
+// CloudLens - Network Security Rules Module
 // Comprehensive network security analysis rules for cloud infrastructure
 // Part of the 40K lines security rules implementation
 
