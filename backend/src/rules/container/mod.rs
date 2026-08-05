@@ -1,4 +1,4 @@
-// CloudGhidra - Container Security Rules Module
+// CloudLens - Container Security Rules Module
 // Comprehensive container and Kubernetes security rules
 // Part of the 40K lines security rules implementation
 

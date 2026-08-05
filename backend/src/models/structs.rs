@@ -1,4 +1,4 @@
-//! CloudGhidra Core Data Structures
+//! CloudLens Core Data Structures
 //! 
 //! This module defines the main data structures used throughout the platform,
 //! including resources, risks, policies, and analysis results.

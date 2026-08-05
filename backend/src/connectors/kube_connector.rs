@@ -4,7 +4,7 @@
 //! - Pods, Deployments, Services, ConfigMaps, Secrets, RBAC
 //! - Real-time configuration fetching via Kubernetes API
 //! - Namespace and cluster handling
-//! - Resource normalization to CloudGhidra internal models
+//! - Resource normalization to CloudLens internal models
 
 use async_trait::async_trait;
 use k8s_openapi::api::{
@@ -27,7 +27,7 @@ use crate::models::{
     CloudProvider, ResourceType, CloudResource, ResourceMetadata, Tag,
 };
 use crate::traits::CloudConnector;
-use crate::error::{CloudGhidraError, Result};
+use crate::error::{CloudLensError, Result};
 
 /// Configuration for Kubernetes Connector
 #[derive(Debug, Clone)]
@@ -88,19 +88,19 @@ impl KubeConnector {
             Config::from_custom_kubeconfig(
                 load_from_default_home_dir()
                     .await
-                    .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to load kubeconfig: {}", e)))?,
+                    .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to load kubeconfig: {}", e)))?,
                 &kubeconfig_options,
             )
             .await
-            .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to create kube config: {}", e)))?
+            .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to create kube config: {}", e)))?
         } else {
             Config::infer()
                 .await
-                .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to infer kube config: {}", e)))?
+                .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to infer kube config: {}", e)))?
         };
 
         let client = Client::try_from(config)
-            .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to create Kubernetes client: {}", e)))?;
+            .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to create Kubernetes client: {}", e)))?;
 
         self.client = Some(client);
         self.is_connected = true;
@@ -111,13 +111,13 @@ impl KubeConnector {
     /// Scan Pods
     #[instrument(skip(self))]
     async fn scan_pods(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -127,7 +127,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let pods_api: Api<Pod> = Api::namespaced(client.clone(), namespace);
             let pod_list = pods_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list pods in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list pods in {}: {}", namespace, e)))?;
 
             for pod in pod_list.items {
                 let pod_name = pod.name_any();
@@ -308,13 +308,13 @@ impl KubeConnector {
     /// Scan Deployments
     #[instrument(skip(self))]
     async fn scan_deployments(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -324,7 +324,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let deployments_api: Api<Deployment> = Api::namespaced(client.clone(), namespace);
             let deployment_list = deployments_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list deployments in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list deployments in {}: {}", namespace, e)))?;
 
             for deployment in deployment_list.items {
                 let deployment_name = deployment.name_any();
@@ -436,13 +436,13 @@ impl KubeConnector {
     /// Scan Services
     #[instrument(skip(self))]
     async fn scan_services(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -452,7 +452,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let services_api: Api<Service> = Api::namespaced(client.clone(), namespace);
             let service_list = services_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list services in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list services in {}: {}", namespace, e)))?;
 
             for service in service_list.items {
                 let service_name = service.name_any();
@@ -567,13 +567,13 @@ impl KubeConnector {
     /// Scan ConfigMaps
     #[instrument(skip(self))]
     async fn scan_configmaps(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -583,7 +583,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let cms_api: Api<ConfigMap> = Api::namespaced(client.clone(), namespace);
             let cm_list = cms_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list configmaps in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list configmaps in {}: {}", namespace, e)))?;
 
             for cm in cm_list.items {
                 let cm_name = cm.name_any();
@@ -648,13 +648,13 @@ impl KubeConnector {
             return Ok(Vec::new());
         }
 
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -664,7 +664,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let secrets_api: Api<Secret> = Api::namespaced(client.clone(), namespace);
             let secret_list = secrets_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list secrets in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list secrets in {}: {}", namespace, e)))?;
 
             for secret in secret_list.items {
                 let secret_name = secret.name_any();
@@ -718,14 +718,14 @@ impl KubeConnector {
     /// Scan RBAC Roles and ClusterRoles
     #[instrument(skip(self))]
     async fn scan_rbac_roles(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         // Scan Namespaced Roles
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -735,7 +735,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let roles_api: Api<Role> = Api::namespaced(client.clone(), namespace);
             let role_list = roles_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list roles in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list roles in {}: {}", namespace, e)))?;
 
             for role in role_list.items {
                 let role_name = role.name_any();
@@ -804,7 +804,7 @@ impl KubeConnector {
         // Scan ClusterRoles
         let cluster_roles_api: Api<ClusterRole> = Api::all(client.clone());
         let cluster_role_list = cluster_roles_api.list(&ListParams::default()).await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list clusterroles: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list clusterroles: {}", e)))?;
 
         for cluster_role in cluster_role_list.items {
             let role_name = cluster_role.name_any();
@@ -889,13 +889,13 @@ impl KubeConnector {
     /// Scan ServiceAccounts
     #[instrument(skip(self))]
     async fn scan_service_accounts(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -905,7 +905,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let sa_api: Api<ServiceAccount> = Api::namespaced(client.clone(), namespace);
             let sa_list = sa_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list serviceaccounts in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list serviceaccounts in {}: {}", namespace, e)))?;
 
             for sa in sa_list.items {
                 let sa_name = sa.name_any();
@@ -971,13 +971,13 @@ impl KubeConnector {
     /// Scan NetworkPolicies
     #[instrument(skip(self))]
     async fn scan_network_policies(&self) -> Result<Vec<CloudResource>> {
-        let client = self.client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let client = self.client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let namespaces = if self.config.scan_all_namespaces {
             let ns_api: Api<Namespace> = Api::all(client.clone());
             let ns_list = ns_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list namespaces: {}", e)))?;
             
             ns_list.items.iter().map(|ns| ns.name_any()).collect::<Vec<_>>()
         } else {
@@ -987,7 +987,7 @@ impl KubeConnector {
         for namespace in &namespaces {
             let np_api: Api<NetworkPolicy> = Api::namespaced(client.clone(), namespace);
             let np_list = np_api.list(&ListParams::default()).await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list networkpolicies in {}: {}", namespace, e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list networkpolicies in {}: {}", namespace, e)))?;
 
             for np in np_list.items {
                 let np_name = np.name_any();
@@ -1085,7 +1085,7 @@ impl CloudConnector for KubeConnector {
     #[instrument(skip(self))]
     async fn scan_resources(&self, resource_types: Option<Vec<ResourceType>>) -> Result<Vec<CloudResource>> {
         if !self.is_connected {
-            return Err(CloudGhidraError::NotConnected);
+            return Err(CloudLensError::NotConnected);
         }
 
         let mut all_resources = Vec::new();

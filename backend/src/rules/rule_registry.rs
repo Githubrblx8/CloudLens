@@ -46,7 +46,7 @@ impl RuleMetadata {
             compliance_frameworks: Vec::new(),
             tags: Vec::new(),
             version: "1.0.0".to_string(),
-            author: "CloudGhidra".to_string(),
+            author: "CloudLens".to_string(),
             enabled: true,
             auto_remediation_available: false,
         }

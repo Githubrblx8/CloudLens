@@ -4,7 +4,7 @@
 //! - Compute Engine, Cloud Storage, Cloud SQL, IAM, VPC, GKE
 //! - Real-time configuration fetching via GCP SDK
 //! - Project and organization handling
-//! - Resource normalization to CloudGhidra internal models
+//! - Resource normalization to CloudLens internal models
 
 use async_trait::async_trait;
 use gcp_auth::{AuthenticationManager, Client};
@@ -18,7 +18,7 @@ use crate::models::{
     CloudProvider, ResourceType, CloudResource, ResourceMetadata, Tag,
 };
 use crate::traits::CloudConnector;
-use crate::error::{CloudGhidraError, Result};
+use crate::error::{CloudLensError, Result};
 
 /// Configuration for GCP Connector
 #[derive(Debug, Clone)]
@@ -395,17 +395,17 @@ impl GcpConnector {
         let auth_manager = if let Some(creds_path) = &self.config.credentials_path {
             AuthenticationManager::from_credentials_file(creds_path)
                 .await
-                .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to load GCP credentials: {}", e)))?
+                .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to load GCP credentials: {}", e)))?
         } else {
             AuthenticationManager::new()
                 .await
-                .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to initialize GCP auth: {}", e)))?
+                .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to initialize GCP auth: {}", e)))?
         };
 
         let http_client = HttpClient::builder()
             .timeout(Duration::from_secs(self.config.scan_timeout_secs))
             .build()
-            .map_err(|e| CloudGhidraError::ConfigurationError(format!("Failed to create HTTP client: {}", e)))?;
+            .map_err(|e| CloudLensError::ConfigurationError(format!("Failed to create HTTP client: {}", e)))?;
 
         self.auth_manager = Some(auth_manager);
         self.http_client = Some(http_client);
@@ -416,11 +416,11 @@ impl GcpConnector {
 
     /// Get authorization header
     async fn get_auth_header(&self) -> Result<String> {
-        let auth_manager = self.auth_manager.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let auth_manager = self.auth_manager.as_ref().ok_or(CloudLensError::NotConnected)?;
         let token = auth_manager
             .token("https://www.googleapis.com/auth/cloud-platform")
             .await
-            .map_err(|e| CloudGhidraError::AuthenticationError(format!("Failed to get GCP token: {}", e)))?;
+            .map_err(|e| CloudLensError::AuthenticationError(format!("Failed to get GCP token: {}", e)))?;
         
         Ok(format!("Bearer {}", token.as_str()))
     }
@@ -428,7 +428,7 @@ impl GcpConnector {
     /// Scan Compute Engine Instances
     #[instrument(skip(self))]
     async fn scan_compute_instances(&self) -> Result<Vec<CloudResource>> {
-        let http_client = self.http_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let http_client = self.http_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         for zone in &self.config.zones {
@@ -443,7 +443,7 @@ impl GcpConnector {
                 .header("Authorization", &auth_header)
                 .send()
                 .await
-                .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list instances: {}", e)))?;
+                .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list instances: {}", e)))?;
 
             if !response.status().is_success() {
                 warn!("Failed to fetch instances in zone {}: {}", zone, response.status());
@@ -453,7 +453,7 @@ impl GcpConnector {
             let body: GcpItemListResponse<GcpInstance> = response
                 .json()
                 .await
-                .map_err(|e| CloudGhidraError::ParseError(format!("Failed to parse instances response: {}", e)))?;
+                .map_err(|e| CloudLensError::ParseError(format!("Failed to parse instances response: {}", e)))?;
 
             if let Some(instances) = body.items {
                 for instance in instances {
@@ -570,7 +570,7 @@ impl GcpConnector {
     /// Scan Cloud Storage Buckets
     #[instrument(skip(self))]
     async fn scan_storage_buckets(&self) -> Result<Vec<CloudResource>> {
-        let http_client = self.http_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let http_client = self.http_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let url = format!(
@@ -584,10 +584,10 @@ impl GcpConnector {
             .header("Authorization", &auth_header)
             .send()
             .await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list buckets: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list buckets: {}", e)))?;
 
         if !response.status().is_success() {
-            return Err(CloudGhidraError::ExternalServiceError(
+            return Err(CloudLensError::ExternalServiceError(
                 format!("Failed to fetch buckets: {}", response.status())
             ));
         }
@@ -602,7 +602,7 @@ impl GcpConnector {
         let body: BucketListResponse = response
             .json()
             .await
-            .map_err(|e| CloudGhidraError::ParseError(format!("Failed to parse buckets response: {}", e)))?;
+            .map_err(|e| CloudLensError::ParseError(format!("Failed to parse buckets response: {}", e)))?;
 
         if let Some(buckets) = body.items {
             for bucket in buckets {
@@ -677,7 +677,7 @@ impl GcpConnector {
     /// Scan Cloud SQL Instances
     #[instrument(skip(self))]
     async fn scan_sql_instances(&self) -> Result<Vec<CloudResource>> {
-        let http_client = self.http_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let http_client = self.http_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let url = format!(
@@ -691,7 +691,7 @@ impl GcpConnector {
             .header("Authorization", &auth_header)
             .send()
             .await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list SQL instances: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list SQL instances: {}", e)))?;
 
         if !response.status().is_success() {
             warn!("Failed to fetch SQL instances: {}", response.status());
@@ -707,7 +707,7 @@ impl GcpConnector {
         let body: SqlInstanceListResponse = response
             .json()
             .await
-            .map_err(|e| CloudGhidraError::ParseError(format!("Failed to parse SQL instances response: {}", e)))?;
+            .map_err(|e| CloudLensError::ParseError(format!("Failed to parse SQL instances response: {}", e)))?;
 
         if let Some(instances) = body.items {
             for instance in instances {
@@ -835,7 +835,7 @@ impl GcpConnector {
     /// Scan GKE Clusters
     #[instrument(skip(self))]
     async fn scan_gke_clusters(&self) -> Result<Vec<CloudResource>> {
-        let http_client = self.http_client.as_ref().ok_or(CloudGhidraError::NotConnected)?;
+        let http_client = self.http_client.as_ref().ok_or(CloudLensError::NotConnected)?;
         let mut resources = Vec::new();
 
         let url = format!(
@@ -849,7 +849,7 @@ impl GcpConnector {
             .header("Authorization", &auth_header)
             .send()
             .await
-            .map_err(|e| CloudGhidraError::ExternalServiceError(format!("Failed to list GKE clusters: {}", e)))?;
+            .map_err(|e| CloudLensError::ExternalServiceError(format!("Failed to list GKE clusters: {}", e)))?;
 
         if !response.status().is_success() {
             warn!("Failed to fetch GKE clusters: {}", response.status());
@@ -864,7 +864,7 @@ impl GcpConnector {
         let body: ClusterListResponse = response
             .json()
             .await
-            .map_err(|e| CloudGhidraError::ParseError(format!("Failed to parse clusters response: {}", e)))?;
+            .map_err(|e| CloudLensError::ParseError(format!("Failed to parse clusters response: {}", e)))?;
 
         if let Some(clusters) = body.clusters {
             for cluster in clusters {
@@ -1043,7 +1043,7 @@ impl CloudConnector for GcpConnector {
     #[instrument(skip(self))]
     async fn scan_resources(&self, resource_types: Option<Vec<ResourceType>>) -> Result<Vec<CloudResource>> {
         if !self.is_connected {
-            return Err(CloudGhidraError::NotConnected);
+            return Err(CloudLensError::NotConnected);
         }
 
         let mut all_resources = Vec::new();

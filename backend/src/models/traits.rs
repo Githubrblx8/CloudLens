@@ -1,4 +1,4 @@
-//! CloudGhidra Trait Definitions
+//! CloudLens Trait Definitions
 //! 
 //! This module defines core traits used throughout the platform for
 //! abstraction, polymorphism, and extensibility.

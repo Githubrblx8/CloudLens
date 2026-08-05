@@ -1,4 +1,4 @@
-// CloudGhidra - Compute Security Rules Module (Complete)
+// CloudLens - Compute Security Rules Module (Complete)
 // Comprehensive compute instance and serverless security rules
 // Part of the 40K lines security rules implementation
 

@@ -1,4 +1,4 @@
-//! Core data models for CloudGhidra
+//! Core data models for CloudLens
 
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

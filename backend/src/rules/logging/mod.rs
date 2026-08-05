@@ -1,4 +1,4 @@
-// CloudGhidra - Logging & Monitoring Security Rules Module
+// CloudLens - Logging & Monitoring Security Rules Module
 // Comprehensive logging, monitoring, and observability security rules
 // Part of the 40K lines security rules implementation
 
