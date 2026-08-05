@@ -138,7 +138,7 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pul
 
 ## 📄 License
 
-CloudLens is released under the **Apache License 2.0**, fostering a wide ecosystem of commercial and academic use, similar to Ghidra.
+This project is licensed under the MIT License, fostering a wide ecosystem of commercial and academic use, similar to Ghidra.
 
 See [LICENSE](LICENSE) for details.
 
