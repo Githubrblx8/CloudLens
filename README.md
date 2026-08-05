@@ -131,7 +131,6 @@ Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pul
 
 *   **🐛 Issue Tracker:** Report bugs and feature requests on GitHub
 *   **💬 Discussions:** Ask questions and share ideas in [GitHub Discussions](../../discussions)
-*   **📧 Contact:** security@cloudlens.dev
 
 *Note: We are currently growing our community. Join the conversation via GitHub Discussions or reach out directly via email.*
 
